@@ -11,5 +11,4 @@ There is a example of how to use the tool when you run it. This is the link the 
 
 # Pip Install requirments
 
-. Shodan
-. rich
+- pip install shodan rich
