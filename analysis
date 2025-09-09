@@ -1,0 +1,112 @@
+import shodan
+from collections import Counter
+from rich.console import Console
+from rich.table import Table
+
+
+def main():
+    api_key = input("Enter your Shodan API key: ").strip()
+    api = shodan.Shodan(api_key)  # use user key
+    console = Console()
+
+    ans = input("Would you like to use example query (yes/no)? ").strip().lower()
+    if ans.lower() == "yes" or ans == "y":
+        # List of example queries
+        example_queries = [
+            "port:80 country:US apache",
+            'nginx city:"Los Angeles" port:443',
+            "microsoft-iis country:DE port:80",
+            "port:22 openssh country:US",
+            'apache port:80 org:"Amazon" city:"New York"',
+        ]
+
+        print("\nSelect an example query:")
+        for i, query in enumerate(example_queries, 1):
+            print(f"{i}. {query}")
+
+        try:
+            choice = int(input("Enter number (1-5): ")) - 1
+            if 0 <= choice < len(example_queries):
+                query = example_queries[choice]
+                print(f"Selected query: {query}")
+            else:
+                print("Invalid selection, using default query")
+                query = example_queries[0]  # fallback to first query
+        except ValueError:
+            print("Invalid input, using default query")
+            query = example_queries[0]  # fallback to first query
+
+    else:
+        print(
+            "Please be very mindful of syntax. Check out the example query to see how its done"
+        )
+        city_query = input("Enter city name (or press Enter to skip): ").strip()
+        if city_query:
+            query = input("Enter the rest of your Shodan query: ")
+            query = f'city:"{city_query}" {query}'
+        else:
+            query = input(
+                "Enter your full Shodan query (if you don't enter a city it will do a generic search, data will be confusing): "
+            )
+
+    city_report(query, api, console)
+
+
+def city_report(usr_query: str, api, console):
+    query = usr_query
+    print(f"[*] Running query: {query}")
+
+    try:
+        results = api.search(query, limit=200)  # first 200 results
+    except shodan.APIError as e:
+        print(f"[!] Shodan API Error: {e}")
+        return
+
+    cves, orgs, services = Counter(), Counter(), Counter()
+
+    for match in results["matches"]:
+        # Vulnerabilities
+        vulns = match.get("vulns", {})
+        cves.update(vulns.keys())
+
+        # Organizations
+        orgs.update([match.get("org", "Unknown")])
+
+        # Services
+        product = match.get("product")
+        if product:
+            services.update([product])
+
+    #  Output summaries
+
+    if not results["matches"]:
+        print("[!] No results found.")
+        return
+
+    # CVEs
+    table = Table(title=f"Top CVEs in {query}")
+    table.add_column("CVE")
+
+    for cve, count in cves.most_common(5):
+        table.add_row(cve)
+    console.print(table)
+
+    # Orgs
+    table = Table(title="Most Exposed Orgs")
+    table.add_column("Org")
+    table.add_column("Hosts")
+    for org, count in orgs.most_common(5):
+        table.add_row(org, str(count))
+    console.print(table)
+
+    # Services
+    table = Table(title="Exposed Services")
+    table.add_column("Service")
+    table.add_column("Hosts")
+    for svc, count in services.most_common(5):
+        table.add_row(svc, str(count))
+    console.print(table)
+
+
+if __name__ == "__main__":
+    main()
