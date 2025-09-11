@@ -1,11 +1,10 @@
 # Shodan
-A program I made that summarizes the cybersecurity for a given city
+This tool uses Shodan to automate the discovery, enrichment, and risk assessment of exposed devices on the internet. The solution collects device data, extracts and ranks vulnerabilities (CVEs), and generates clear reports, including CSV and JSON exports, enabling efficient cybersecurity analysis and decision-making. (hopefully for good)
 
 
 ## How it works
 
-This program is designed to just summarize exposures in a city. All you have to do is enter a search query but Keep in mind that while it works
-with out a city in the query. Its intended to work with one. I was halfway through writing it before I realized that. This is just a quick prototype of a deeper analysis tool.
+This program works by entering a normal shodan query
 
 There is a example of how to use the tool when you run it. This is the link the official search query docs. https://www.shodan.io/search/examples
 
@@ -21,7 +20,7 @@ YOU WILL NEED AN API KEY, THE FREE KEY DOES NOT WORK WITH PYTHON API
 
 # Example Output
 
-Enter your Shodan API key: FC0E2XPv8cbTyP6F2yKeHckPYca4isQp
+Enter your Shodan API key: 
 Would you like to use example query (yes/no)? yes
 
 Select an example query:
@@ -64,3 +63,10 @@ Selected query: apache port:80 org:"Amazon"
 │ Apache Superset                 │ 1     │
 │ Nextcloud                       │ 1     │
 └─────────────────────────────────┴───────┘
+
+
+
+
+# Digging Deep
+
+I have completed the deeper analysis of this project. 
