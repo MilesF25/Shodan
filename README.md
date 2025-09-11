@@ -34,4 +34,4 @@ ranking cves
 adding up the scores 
 
 
-![screenshot](Screenshot 2025-09-11 170257.png)
+![Result](image.png)
