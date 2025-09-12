@@ -22,6 +22,9 @@ There is a example of how to use the tool when you run it. This is the link the 
 - NOT ALL QUERIES WILL RETURN CVEs
 
 
+# Running The Program
+
+Just do python run deep_analysis.py
 
 # Example Output
 
