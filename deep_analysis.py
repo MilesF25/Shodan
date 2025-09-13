@@ -11,6 +11,7 @@ import os
 import json
 
 
+# update to do :Highest individual CVE score per device
 def main():
     api_key = input("Enter your Shodan API key: ").strip()
     api = shodan.Shodan(api_key)  # use user key
@@ -32,10 +33,10 @@ def main():
     final_score = add_scores_to_devices(shodan_results, ranked_cves)  # list, dict
 
     # easy display
-    display = print_devices_table(final_score)
+    print_devices_table(final_score)
 
     ans = input("Would you like to write the result to a csv? yes/no?: ")
-    if ans.lower() == "yes" or "y":
+    if ans.lower() == "yes" or ans.lower() == "y":
         # csv save
         file_name = save_csvname()
         unique_name = uniquify(file_name)
@@ -49,7 +50,11 @@ def main():
         print("Be sure to check how many tokens you have left")
 
 
+# go through and add error handling
+
 # this will just make sure there are no dupe files
+
+
 def uniquify(path):
     filename, extension = os.path.splitext(path)
     counter = 1
@@ -139,40 +144,44 @@ def extract_shodan_match(results: dict) -> list:
     Extracts useful fields from a Shodan host match safely.
     Always returns a dict with consistent keys.
     """
-    devices = []
-    for match in results["matches"]:
-        #         # Extract and structure each device's data
+    if type(results) is dict:
+        devices = []
+        for match in results["matches"]:
+            #         # Extract and structure each device's data
 
-        device = {
-            # Core identifiers
-            "ip": match.get("ip_str", "N/A"),
-            "port": match.get("port", "N/A"),
-            "transport": match.get("transport", "N/A"),
-            # Organization / network
-            "org": match.get("org", "Unknown"),
-            "asn": match.get("asn", "N/A"),
-            "isp": match.get("isp", "N/A"),
-            # Host identifiers
-            # removed https
-            # Software / service
-            "product": match.get("product", "Unknown"),
-            "version": match.get("version", "N/A"),
-            "cpe": match.get("cpe", []),
-            "os": match.get("os", "Unknown"),
-            # Security
-            "vulns": list(match.get("vulns", {}).keys()),  # just CVE IDs
-            # removed ssl
-            "ssh": match.get("ssh", {}),
-            # Location
-            "city": match.get("city", "Unknown"),
-            "region_code": match.get("region_code", "Unknown"),
-            "country_name": match.get("country_name", "Unknown"),
-            "country_code": match.get("country_code", "XX"),
-            "latitude": match.get("latitude", None),
-            "longitude": match.get("longitude", None),
-        }
-        devices.append(device)
-    return devices
+            device = {
+                # Core identifiers
+                "ip": match.get("ip_str", "N/A"),
+                "port": match.get("port", "N/A"),
+                "transport": match.get("transport", "N/A"),
+                # Organization / network
+                "org": match.get("org", "Unknown"),
+                "asn": match.get("asn", "N/A"),
+                "isp": match.get("isp", "N/A"),
+                # Host identifiers
+                # removed https
+                # Software / service
+                "product": match.get("product", "Unknown"),
+                "version": match.get("version", "N/A"),
+                "cpe": match.get("cpe", []),
+                "os": match.get("os", "Unknown"),
+                # Security
+                "vulns": list(match.get("vulns", {}).keys()),  # just CVE IDs
+                # removed ssl
+                "ssh": match.get("ssh", {}),
+                # Location
+                "city": match.get("city", "Unknown"),
+                "region_code": match.get("region_code", "Unknown"),
+                "country_name": match.get("country_name", "Unknown"),
+                "country_code": match.get("country_code", "XX"),
+                "latitude": match.get("latitude", None),
+                "longitude": match.get("longitude", None),
+            }
+            devices.append(device)
+
+        return devices
+    else:
+        print("Expecting a dict")
 
 
 # this calculates the cve scores by extracting the unique scores and using nist api to socre them
