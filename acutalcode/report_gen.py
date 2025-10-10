@@ -222,7 +222,7 @@ def uniquify(path):
 
 def save_filename(filename="devices_info.txt"):
     ans = input(
-        "Would you like to name the csv something other than devices_info.txt? yes/no: "
+        "Would you like to name the txt something other than {filename}? (yes/no) [default: no]: "
     )
 
     if ans.lower() == "yes" or ans.lower() == "y":

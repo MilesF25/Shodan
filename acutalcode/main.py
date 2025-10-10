@@ -43,7 +43,7 @@ def main():
 
         selected_host = select_host(host_data)
         # calls report gen combined function
-        print(f"1 {selected_host}")
+
         report_gen.combined(selected_host)
         print("Finished generating report.")
 
