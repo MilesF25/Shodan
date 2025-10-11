@@ -32,22 +32,25 @@ def main_scan():
     # takes the original results (list dict) and cves ranks (dict) and calculates the cve score in the og results
     final_score = add_scores_to_devices(shodan_results, ranked_cves)  # list, dict
 
-    # easy display
-    print_devices_table(final_score)
+    # easy display — print table and get boolean indicating if there were devices
+    has_devices = print_devices_table(final_score)
+    if not has_devices:
+        return False
 
-    ans = input("Would you like to write the result to a csv? yes/no?: ")
-    if ans.lower() == "yes" or ans.lower() == "y":
-        # csv save
-        file_name = save_csvname()
-        unique_name = uniquify(file_name)
-        save_output(shodan_results, unique_name, query)
-        # json format
-        json_name = save_jsoname()
-        json_unique = uniquify(json_name)
-        json_dump_format(shodan_results, json_unique)
-
-    else:
-        print("Be sure to check how many tokens you have left")
+    # Only prompt to save outputs if we printed devices
+    if has_devices:
+        ans = input("Would you like to write the result to a csv? yes/no?: ")
+        if ans.lower() == "yes" or ans.lower() == "y":
+            # csv save
+            file_name = save_csvname()
+            unique_name = uniquify(file_name)
+            save_output(shodan_results, unique_name, query)
+            # json format
+            json_name = save_jsoname()
+            json_unique = uniquify(json_name)
+            json_dump_format(shodan_results, json_unique)
+        else:
+            print("Be sure to check how many tokens you have left")
 
 
 # go through and add error handling
@@ -286,7 +289,8 @@ def print_devices_table(devices):
     """Print devices in a neat table format, sorted by score (highest to lowest)"""
     if not devices:
         print("No devices found.")
-        return
+        # this is done so csv isn't saved if no devices
+        return False
 
     # Sort by score descending (highest to lowest)
     sorted_devices = sorted(devices, key=lambda x: x.get("score", 0), reverse=True)
@@ -317,6 +321,9 @@ def print_devices_table(devices):
         print(
             f"{rank:<5} {ip:<15} {port:<6} {product:<20} {cve_count:<5} {score:<8.1f} {severity} {cves}"
         )
+
+    # indicate we printed devices
+    return True
 
 
 # TEST DICT THAT WORKS
