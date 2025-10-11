@@ -16,7 +16,7 @@ def main():
     ).ask()
 
     if choice == "Scan":
-        deep_analysis.run_scan()
+        deep_analysis.main_scan()
         print("Finished scan.")
     elif choice == "Report":
         # empty file to store json files for selection
